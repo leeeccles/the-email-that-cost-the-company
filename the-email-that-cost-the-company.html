@@ -40,8 +40,8 @@
       height: 100vh;
       height: 100dvh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: clamp(0.6rem, 2vw, 1.25rem);
       overflow: hidden;
     }
@@ -51,8 +51,8 @@
       display: none;
       width: 100%;
       max-width: 680px;
-      height: 100%;
-      max-height: 100%;
+      flex: 1;
+      min-height: 0;
       animation: fadeIn 0.35s ease forwards;
     }
     .screen.active { display: flex; flex-direction: column; }
@@ -1039,16 +1039,19 @@
 
   // ─── Fullscreen ───
   function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
-    } else {
-      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    }
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+    const active = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!active && req) req.call(el);
+    else if (active && exit) exit.call(document);
   }
-  document.addEventListener('fullscreenchange', () => {
-    const full = !!document.fullscreenElement;
-    document.getElementById('fs-expand').style.display = full ? 'none' : '';
-    document.getElementById('fs-compress').style.display = full ? '' : 'none';
+  ['fullscreenchange','webkitfullscreenchange'].forEach(e => {
+    document.addEventListener(e, () => {
+      const full = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      document.getElementById('fs-expand').style.display = full ? 'none' : '';
+      document.getElementById('fs-compress').style.display = full ? '' : 'none';
+    });
   });
 
   // ─── Completion signal ───
