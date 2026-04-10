@@ -32,16 +32,18 @@
       background: var(--grey-50);
       color: var(--grey-900);
       -webkit-font-smoothing: antialiased;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     /* ─── Layout shell ─── */
     #app {
-      min-height: 100%;
+      height: 100vh;
+      height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.25rem;
+      padding: clamp(0.6rem, 2vw, 1.25rem);
+      overflow: hidden;
     }
 
     /* ─── Screen transitions ─── */
@@ -49,6 +51,8 @@
       display: none;
       width: 100%;
       max-width: 680px;
+      height: 100%;
+      max-height: 100%;
       animation: fadeIn 0.35s ease forwards;
     }
     .screen.active { display: flex; flex-direction: column; }
@@ -65,6 +69,9 @@
       padding: clamp(1rem, 4vw, 2rem) clamp(0.9rem, 3.5vw, 1.75rem);
       box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
       width: 100%;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
     }
 
     /* ─── Typography ─── */
@@ -198,6 +205,21 @@
     .notif-text strong { color: var(--grey-900); font-weight: 600; }
 
     /* ─── Screen 2: Email ─── */
+    .email-wrapper {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: clamp(8px, 1.5vw, 12px);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+    }
+    .email-client {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
     .inbox-chrome {
       background: var(--grey-900);
       border-radius: 12px 12px 0 0;
@@ -223,8 +245,6 @@
     .email-client {
       border: 1px solid var(--grey-200);
       border-top: none;
-      border-radius: 0 0 12px 12px;
-      overflow: hidden;
     }
     .email-sidebar {
       background: var(--grey-50);
@@ -527,6 +547,28 @@
     .mt-2 { margin-top: 1rem; }
     .mt-3 { margin-top: 1.5rem; }
 
+    /* ─── Fullscreen button ─── */
+    #fs-btn {
+      position: fixed;
+      top: 0.6rem;
+      right: 0.6rem;
+      z-index: 200;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--grey-200);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--grey-600);
+      backdrop-filter: blur(4px);
+      transition: background 0.15s, color 0.15s;
+      padding: 0;
+    }
+    #fs-btn:hover { background: #fff; color: var(--grey-900); }
+
     /* ─── Structural breakpoints (layout only — sizing handled by clamp above) ─── */
 
     /* Short viewports: anchor content to top so it scrolls naturally */
@@ -543,6 +585,18 @@
   </style>
 </head>
 <body>
+
+<button id="fs-btn" onclick="toggleFullscreen()" title="Toggle fullscreen" aria-label="Toggle fullscreen">
+  <svg id="fs-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+    <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+  </svg>
+  <svg id="fs-compress" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+    <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+    <line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>
+  </svg>
+</button>
+
 <div id="app">
 
   <!-- ════════════════════════════════════
@@ -583,6 +637,7 @@
        SCREEN 2 — EMAIL SIMULATION
   ════════════════════════════════════ -->
   <section class="screen" id="screen-2">
+    <div class="email-wrapper">
     <div class="inbox-chrome">
       <div class="chrome-dot r"></div>
       <div class="chrome-dot y"></div>
@@ -644,7 +699,8 @@
         </div>
       </div>
     </div>
-    <div style="margin-top:1rem;">
+    </div><!-- /.email-wrapper -->
+    <div style="margin-top:0.75rem;">
       <button class="btn btn-primary" onclick="goTo(3)">What do you do? →</button>
     </div>
     <div class="progress-dots">
@@ -980,6 +1036,20 @@
     responseEl.classList.remove('hidden');
     continueEl.classList.remove('hidden');
   }
+
+  // ─── Fullscreen ───
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  }
+  document.addEventListener('fullscreenchange', () => {
+    const full = !!document.fullscreenElement;
+    document.getElementById('fs-expand').style.display = full ? 'none' : '';
+    document.getElementById('fs-compress').style.display = full ? '' : 'none';
+  });
 
   // ─── Completion signal ───
   // Screen 7 is the final screen. When the learner reaches it, post a message
