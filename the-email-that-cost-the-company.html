@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Email That Cost the Company</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563EB;
+      --blue-dark: #1d4ed8;
+      --red: #DC2626;
+      --red-light: #FEF2F2;
+      --green: #16A34A;
+      --green-light: #F0FDF4;
+      --amber: #D97706;
+      --amber-light: #FFFBEB;
+      --grey-50: #F9FAFB;
+      --grey-100: #F3F4F6;
+      --grey-200: #E5E7EB;
+      --grey-400: #9CA3AF;
+      --grey-600: #4B5563;
+      --grey-800: #1F2937;
+      --grey-900: #111827;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--grey-50);
+      color: var(--grey-900);
+      -webkit-font-smoothing: antialiased;
+      overflow-y: auto;
+    }
+
+    /* ─── Layout shell ─── */
+    #app {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    /* ─── Screen transitions ─── */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+      animation: fadeIn 0.35s ease forwards;
+    }
+    .screen.active { display: flex; flex-direction: column; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: #fff;
+      border-radius: clamp(10px, 2vw, 16px);
+      padding: clamp(1rem, 4vw, 2rem) clamp(0.9rem, 3.5vw, 1.75rem);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+      width: 100%;
+    }
+
+    /* ─── Typography ─── */
+    .eyebrow {
+      font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-400);
+      margin-bottom: clamp(0.4rem, 1.5vh, 0.75rem);
+    }
+    h1 {
+      font-size: clamp(1.25rem, 4.5vw, 2.25rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--grey-900);
+      margin-bottom: clamp(0.6rem, 2vh, 1rem);
+    }
+    h2 {
+      font-size: clamp(1.05rem, 3.5vw, 1.6rem);
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--grey-900);
+      margin-bottom: clamp(0.4rem, 1.5vh, 0.75rem);
+    }
+    p {
+      font-size: clamp(0.82rem, 2vw, 0.975rem);
+      line-height: 1.6;
+      color: var(--grey-600);
+    }
+    .spacer { margin-bottom: clamp(0.75rem, 2.5vh, 1.25rem); }
+    .spacer-sm { margin-bottom: clamp(0.5rem, 1.5vh, 0.75rem); }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      font-size: clamp(0.82rem, 2.2vw, 0.95rem);
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      padding: clamp(0.6rem, 2vh, 0.85rem) clamp(1rem, 3vw, 1.75rem);
+      min-height: clamp(42px, 6vh, 52px);
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      width: 100%;
+    }
+    .btn-primary:hover { background: var(--blue-dark); }
+
+    .btn-choice {
+      background: var(--grey-100);
+      color: var(--grey-800);
+      width: 100%;
+      text-align: left;
+      justify-content: flex-start;
+      border: 2px solid transparent;
+      padding: clamp(0.65rem, 1.8vh, 1rem) clamp(0.85rem, 2.5vw, 1.25rem);
+      font-size: clamp(0.82rem, 2vw, 0.95rem);
+    }
+    .btn-choice:hover {
+      background: #EFF6FF;
+      border-color: var(--blue);
+      color: var(--blue-dark);
+    }
+
+    .btn-sm {
+      font-size: 0.875rem;
+      padding: 0.65rem 1.25rem;
+      min-height: 40px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--grey-600);
+      border: 2px solid var(--grey-200);
+    }
+    .btn-outline:hover { background: var(--grey-100); }
+
+    .choices { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.5vh, 0.75rem); margin-top: clamp(0.75rem, 2vh, 1.5rem); }
+
+    /* ─── Screen 1: Hook ─── */
+    #screen-1 .timestamp {
+      font-size: clamp(1.75rem, 7vw, 3.5rem);
+      font-weight: 800;
+      color: var(--grey-900);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    #screen-1 .day {
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      font-weight: 500;
+      color: var(--grey-400);
+      margin-bottom: clamp(1rem, 3vh, 1.75rem);
+    }
+    #screen-1 .notification-stack {
+      background: var(--grey-100);
+      border-radius: 10px;
+      padding: clamp(0.65rem, 2vw, 1rem);
+      margin-bottom: clamp(0.75rem, 2.5vh, 1.5rem);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.3rem, 1vh, 0.5rem);
+    }
+    .notif {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+    }
+    .notif-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .notif-dot.red { background: var(--red); }
+    .notif-text { color: var(--grey-600); line-height: 1.4; }
+    .notif-text strong { color: var(--grey-900); font-weight: 600; }
+
+    /* ─── Screen 2: Email ─── */
+    .inbox-chrome {
+      background: var(--grey-900);
+      border-radius: 12px 12px 0 0;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .chrome-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .chrome-dot.r { background: #FF5F57; }
+    .chrome-dot.y { background: #FEBC2E; }
+    .chrome-dot.g { background: #28C840; }
+    .chrome-bar {
+      flex: 1;
+      background: var(--grey-800);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.7rem;
+      color: var(--grey-400);
+      font-family: monospace;
+    }
+
+    .email-client {
+      border: 1px solid var(--grey-200);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+    .email-sidebar {
+      background: var(--grey-50);
+      padding: 1rem;
+      border-bottom: 1px solid var(--grey-200);
+    }
+    .sidebar-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--grey-400);
+      margin-bottom: 0.5rem;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    .sidebar-item.active {
+      background: #EFF6FF;
+      color: var(--blue);
+      font-weight: 600;
+    }
+    .sidebar-item .badge {
+      background: var(--blue);
+      color: white;
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .email-pane { background: #fff; }
+    .email-list-item {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--grey-100);
+      cursor: default;
+    }
+    .email-list-item.unread { background: #EFF6FF; }
+    .email-list-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.2rem;
+    }
+    .email-sender {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--grey-900);
+    }
+    .email-sender.unread { color: var(--blue-dark); }
+    .email-time { font-size: 0.72rem; color: var(--grey-400); }
+    .email-subject {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--grey-800);
+      margin-bottom: 0.15rem;
+    }
+    .email-preview { font-size: 0.72rem; color: var(--grey-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .email-open {
+      padding: 1.25rem 1rem 1rem;
+      border-top: 2px solid var(--blue);
+    }
+    .email-open-header { margin-bottom: 1rem; }
+    .email-from-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--red);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .email-from-details { flex: 1; min-width: 0; }
+    .from-name { font-size: 0.85rem; font-weight: 700; color: var(--grey-900); }
+    .from-address {
+      font-size: 0.72rem;
+      color: var(--grey-400);
+      word-break: break-all;
+    }
+    .from-address.suspicious { color: var(--red); font-weight: 600; }
+    .email-subject-line {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--grey-900);
+      margin-bottom: 0.25rem;
+    }
+    .email-body {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--grey-700, #374151);
+      padding: 1rem;
+      background: var(--grey-50);
+      border-radius: 8px;
+      border: 1px solid var(--grey-200);
+    }
+    .email-body p { color: var(--grey-700, #374151); font-size: 0.82rem; margin-bottom: 0.6rem; }
+    .email-body .email-cta-wrap { margin: 1rem 0; text-align: center; }
+    .email-cta {
+      display: inline-block;
+      background: var(--blue);
+      color: white !important;
+      padding: 0.65rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .email-footer { font-size: 0.7rem; color: var(--grey-400); margin-top: 0.5rem; }
+
+    /* ─── Screen 3: Decision ─── */
+    .pressure-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--red-light);
+      border: 1px solid #FECACA;
+      border-radius: 8px;
+      padding: clamp(0.5rem, 1.5vh, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+      margin-bottom: clamp(0.9rem, 2.5vh, 1.5rem);
+    }
+    .pressure-icon { font-size: 1.1rem; }
+    .pressure-text { font-size: clamp(0.78rem, 1.8vw, 0.82rem); color: var(--red); font-weight: 600; line-height: 1.4; }
+
+    /* ─── Screen 4: Consequence ─── */
+    .outcome-icon { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: clamp(0.5rem, 1.5vh, 1rem); display: block; }
+    .outcome-title { margin-bottom: 0.5rem; }
+
+    .outcome-wrong .card { border-top: 4px solid var(--red); }
+    .outcome-ignore .card { border-top: 4px solid var(--amber); }
+    .outcome-check .card { border-top: 4px solid var(--green); }
+    .outcome-forward .card { border-top: 4px solid var(--green); }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    .tag-red { background: var(--red-light); color: var(--red); }
+    .tag-amber { background: var(--amber-light); color: var(--amber); }
+    .tag-green { background: var(--green-light); color: var(--green); }
+
+    /* ─── Screen 5: Escalation ─── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(0.5rem, 1.5vw, 1rem);
+      margin: clamp(0.75rem, 2.5vh, 1.25rem) 0;
+    }
+    .stat-card {
+      background: var(--red-light);
+      border: 1px solid #FECACA;
+      border-radius: 10px;
+      padding: clamp(0.6rem, 2vw, 1rem);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    .stat-label { font-size: clamp(0.68rem, 1.5vw, 0.75rem); color: var(--grey-600); font-weight: 500; line-height: 1.3; }
+
+    .timeline {
+      border-left: 2px solid var(--grey-200);
+      padding-left: 1.25rem;
+      margin: clamp(0.75rem, 2.5vh, 1.25rem) 0;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.5rem, 1.5vh, 0.85rem);
+    }
+    .timeline-item { position: relative; }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.45rem;
+      top: 5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--red);
+    }
+    .timeline-time { font-size: clamp(0.68rem, 1.5vw, 0.72rem); font-weight: 700; color: var(--red); margin-bottom: 0.15rem; }
+    .timeline-desc { font-size: clamp(0.78rem, 1.8vw, 0.82rem); color: var(--grey-700, #374151); line-height: 1.5; }
+
+    /* ─── Screen 6: Reflection ─── */
+    .reflection-context {
+      font-size: 0.8rem;
+      color: var(--grey-400);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .reflection-context .choice-label {
+      background: var(--grey-100);
+      border: 1px solid var(--grey-200);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-weight: 600;
+      color: var(--grey-700, #374151);
+      font-size: 0.78rem;
+    }
+
+    .reflection-quote {
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      font-weight: 700;
+      color: var(--grey-900);
+      line-height: 1.4;
+      margin-bottom: clamp(0.75rem, 2vh, 1.25rem);
+    }
+    .reflection-sub { font-size: 0.875rem; color: var(--grey-400); margin-bottom: 1.75rem; }
+    .yn-buttons { display: flex; gap: 0.75rem; }
+    .yn-buttons .btn { flex: 1; }
+    .btn-yes { background: var(--grey-100); color: var(--grey-800); border: 2px solid var(--grey-200); }
+    .btn-yes:hover { background: var(--grey-200); }
+    .btn-no { background: var(--grey-100); color: var(--grey-800); border: 2px solid var(--grey-200); }
+    .btn-no:hover { background: var(--grey-200); }
+
+    .reflection-response { margin-top: 1.25rem; animation: fadeIn 0.3s ease; }
+    .reflection-response p { font-size: 0.9rem; }
+
+    /* ─── Screen 7: Transition ─── */
+    .course-preview {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      border: 1px solid #BFDBFE;
+      border-radius: 12px;
+      padding: clamp(0.85rem, 2.5vw, 1.25rem);
+      margin: clamp(0.75rem, 2.5vh, 1.25rem) 0;
+    }
+    .course-preview-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue);
+      margin-bottom: 0.75rem;
+    }
+    .course-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .course-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: clamp(0.78rem, 1.8vw, 0.875rem);
+      color: var(--grey-700, #374151);
+    }
+    .course-list li::before {
+      content: '→';
+      color: var(--blue);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .finish-note { font-size: 0.8rem; color: var(--grey-400); margin-top: 1rem; text-align: center; }
+
+    /* ─── Progress dots ─── */
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: clamp(0.6rem, 2vh, 1.5rem);
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--grey-200);
+      transition: background 0.3s;
+    }
+    .dot.active { background: var(--blue); width: 18px; border-radius: 3px; }
+
+    /* ─── Utility ─── */
+    .hidden { display: none !important; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+
+    /* ─── Structural breakpoints (layout only — sizing handled by clamp above) ─── */
+
+    /* Short viewports: anchor content to top so it scrolls naturally */
+    @media (max-height: 560px) {
+      #app { align-items: flex-start; }
+    }
+
+    /* Narrow screens: stack yn-buttons, collapse stat grid, hide email sidebar */
+    @media (max-width: 440px) {
+      .yn-buttons { flex-direction: column; }
+      .stat-grid { grid-template-columns: 1fr; }
+      .email-sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ════════════════════════════════════
+       SCREEN 1 — HOOK
+  ════════════════════════════════════ -->
+  <section class="screen active" id="screen-1">
+    <div class="card">
+      <div class="eyebrow">Monday Morning</div>
+      <div class="timestamp">09:12</div>
+      <div class="day">April 14th — You're already 12 minutes late to a team standup.</div>
+
+      <div class="notification-stack">
+        <div class="sidebar-label">Inbox — 23 unread</div>
+        <div class="notif">
+          <div class="notif-dot"></div>
+          <div class="notif-text"><strong>Rachel (Manager)</strong> — "Did you get the brief? Need it by 10."</div>
+        </div>
+        <div class="notif">
+          <div class="notif-dot"></div>
+          <div class="notif-text"><strong>Slack (4 messages)</strong> — "Quick call at 9:30?"</div>
+        </div>
+        <div class="notif">
+          <div class="notif-dot red"></div>
+          <div class="notif-text"><strong>Microsoft Account Services</strong> — "URGENT: Your account will be suspended…"</div>
+        </div>
+      </div>
+
+      <p class="spacer">You scan your inbox on the way to your desk. Coffee in one hand, laptop bag in the other. The red notification catches your eye.</p>
+      <button class="btn btn-primary" onclick="goTo(2)">Open inbox →</button>
+    </div>
+    <div class="progress-dots">
+      <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 2 — EMAIL SIMULATION
+  ════════════════════════════════════ -->
+  <section class="screen" id="screen-2">
+    <div class="inbox-chrome">
+      <div class="chrome-dot r"></div>
+      <div class="chrome-dot y"></div>
+      <div class="chrome-dot g"></div>
+      <div class="chrome-bar">mail.company.com</div>
+    </div>
+    <div class="email-client">
+      <div class="email-sidebar">
+        <div class="sidebar-label">Folders</div>
+        <div class="sidebar-item active">Inbox <span class="badge">23</span></div>
+        <div class="sidebar-item">Sent</div>
+        <div class="sidebar-item">Drafts <span style="font-size:.7rem;color:var(--grey-400)">2</span></div>
+      </div>
+      <div class="email-pane">
+        <div class="email-list-item">
+          <div class="email-list-meta">
+            <span class="email-sender">Rachel M.</span>
+            <span class="email-time">9:08</span>
+          </div>
+          <div class="email-subject">Re: Q2 brief — need by 10am</div>
+          <div class="email-preview">Just checking you got my note from yesterday...</div>
+        </div>
+        <div class="email-list-item unread">
+          <div class="email-list-meta">
+            <span class="email-sender unread">Microsoft Account Services</span>
+            <span class="email-time">8:54</span>
+          </div>
+          <div class="email-subject">⚠ URGENT: Your account will be suspended in 24 hours</div>
+          <div class="email-preview">Action required — verify your credentials immediately to avoid...</div>
+        </div>
+        <div class="email-list-item">
+          <div class="email-list-meta">
+            <span class="email-sender">IT Helpdesk</span>
+            <span class="email-time">Yesterday</span>
+          </div>
+          <div class="email-subject">Scheduled maintenance — Fri 11pm</div>
+          <div class="email-preview">Brief outage expected for system updates...</div>
+        </div>
+
+        <!-- Open email -->
+        <div class="email-open">
+          <div class="email-from-row">
+            <div class="avatar">M</div>
+            <div class="email-from-details">
+              <div class="from-name">Microsoft Account Services</div>
+              <div class="from-address">security@micros0ft-accounts.com</div>
+            </div>
+          </div>
+          <div class="email-subject-line">⚠ URGENT: Your account will be suspended in 24 hours</div>
+          <div class="email-body">
+            <p>Dear User,</p>
+            <p>We have detected <strong>unusual sign-in activity</strong> on your Microsoft account. To protect your account, access will be <strong>suspended within 24 hours</strong> unless you verify your identity.</p>
+            <div class="email-cta-wrap">
+              <span class="email-cta">Verify Account Now</span>
+            </div>
+            <p>If you do not act immediately, you will lose access to all Microsoft 365 services, including Teams, Outlook, and SharePoint.</p>
+            <div class="email-footer">Microsoft Corporation · One Microsoft Way · Redmond, WA 98052<br>© 2024 Microsoft. All rights reserved. <a href="#" style="color:inherit">Unsubscribe</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;">
+      <button class="btn btn-primary" onclick="goTo(3)">What do you do? →</button>
+    </div>
+    <div class="progress-dots">
+      <div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 3 — DECISION POINT
+  ════════════════════════════════════ -->
+  <section class="screen" id="screen-3">
+    <div class="card">
+      <div class="pressure-bar">
+        <span class="pressure-icon">⏱</span>
+        <span class="pressure-text">You have 8 minutes before the standup. Rachel is waiting on your brief.</span>
+      </div>
+      <h2>You've just read the email.</h2>
+      <p>Your 365 account is your work. Teams, files, everything. Losing access would be a disaster.</p>
+      <div class="choices">
+        <button class="btn btn-choice" onclick="choose('wrong')">
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Click "Verify Account" and log in</div>
+            <div style="font-size:0.78rem;color:var(--grey-400);font-weight:400">Get it sorted quickly before the meeting</div>
+          </div>
+        </button>
+        <button class="btn btn-choice" onclick="choose('ignore')">
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Ignore it — deal with it later</div>
+            <div style="font-size:0.78rem;color:var(--grey-400);font-weight:400">Too busy right now</div>
+          </div>
+        </button>
+        <button class="btn btn-choice" onclick="choose('check')">
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Check the sender address and hover over the link</div>
+            <div style="font-size:0.78rem;color:var(--grey-400);font-weight:400">Something feels off</div>
+          </div>
+        </button>
+        <button class="btn btn-choice" onclick="choose('forward')">
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Forward it to IT and flag as suspicious</div>
+            <div style="font-size:0.78rem;color:var(--grey-400);font-weight:400">Let the experts handle it</div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 4 — CONSEQUENCE (dynamic)
+  ════════════════════════════════════ -->
+  <section class="screen" id="screen-4">
+    <div class="card" id="outcome-card">
+      <!-- Filled by JS -->
+    </div>
+    <div class="progress-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 5 — ESCALATION (wrong only)
+  ════════════════════════════════════ -->
+  <section class="screen" id="screen-5">
+    <div class="card">
+      <div class="tag tag-red">Incident Report</div>
+      <h2>Here's what happened next.</h2>
+      <p>The credential harvesting site logged your password instantly. An automated script began using it within minutes.</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-time">09:14 — 2 minutes later</div>
+          <div class="timeline-desc">Your Microsoft credentials are captured and sent to a server in Eastern Europe.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-time">09:31 — 17 minutes later</div>
+          <div class="timeline-desc">An attacker logs into your account. They access SharePoint, download client files, and read your emails.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-time">11:20 — same morning</div>
+          <div class="timeline-desc">A phishing email is sent to 47 colleagues — this time from your account. It looks completely legitimate.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-time">14:35 — that afternoon</div>
+          <div class="timeline-desc">IT detects abnormal login patterns. By now, 3 more accounts are compromised. The incident response team is called in.</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-number">£85k</div>
+          <div class="stat-label">Average cost of a business email compromise incident</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">9 days</div>
+          <div class="stat-label">Average time to contain a credential-based breach</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">91%</div>
+          <div class="stat-label">Of cyberattacks start with a phishing email</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3 sec</div>
+          <div class="stat-label">How long it takes to click a link and change everything</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo(6)">Continue →</button>
+    </div>
+    <div class="progress-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 6 — REFLECTION
+  ════════════════════════════════════ -->
+  <section class="screen" id="screen-6">
+    <div class="card">
+      <div id="reflection-context" class="reflection-context"></div>
+      <div class="reflection-quote">"If you hadn't known this was a test — would you have clicked?"</div>
+      <div class="yn-buttons">
+        <button class="btn btn-yes" onclick="reflect('yes')">Yes, probably</button>
+        <button class="btn btn-no" onclick="reflect('no')">No, I'd have caught it</button>
+      </div>
+      <div id="reflection-response" class="reflection-response hidden"></div>
+      <div id="reflection-continue" class="hidden mt-3">
+        <button class="btn btn-primary" onclick="goTo(7)">See what you'll learn →</button>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════
+       SCREEN 7 — TRANSITION
+  ════════════════════════════════════ -->
+  <section class="screen" id="screen-7">
+    <div class="card">
+      <div class="eyebrow">You're ready to learn</div>
+      <h1>Now you know what's at stake.</h1>
+      <p class="spacer">This scenario plays out in real companies every day. The good news: it's entirely preventable. This course gives you the knowledge to stop it before it starts.</p>
+
+      <div class="course-preview">
+        <div class="course-preview-label">In this course, you'll learn to</div>
+        <ul class="course-list">
+          <li>Spot the 6 tell-tale signs of a phishing email — even convincing ones</li>
+          <li>Understand what attackers want and how they engineer urgency</li>
+          <li>Use the 30-second verification checklist before acting on any suspicious email</li>
+          <li>Know exactly what to do (and who to tell) when something feels wrong</li>
+          <li>Protect yourself and your colleagues — not just your own account</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="progress-dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ─── State ───
+  let userChoice = null;
+
+  // ─── Navigation ───
+  function goTo(screenNum) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + screenNum).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (screenNum === 6) populateReflectionContext();
+  }
+
+  // ─── Populate reflection context from prior choice ───
+  function populateReflectionContext() {
+    const labels = {
+      wrong:   'You clicked the link and logged in.',
+      ignore:  'You ignored the email.',
+      check:   'You checked the sender and hovered over the link.',
+      forward: 'You forwarded it to IT.'
+    };
+
+    const questions = {
+      wrong:   '"If you hadn\'t known this was a test — would you have clicked?"',
+      ignore:  '"If you hadn\'t known this was a test — would you have clicked?"',
+      check:   '"Would you have been that careful on a busier day?"',
+      forward: '"Would you always flag it to IT, even under pressure?"'
+    };
+
+    const yesLabel = {
+      wrong:   'Yes, probably',
+      ignore:  'Yes, probably',
+      check:   'Probably yes',
+      forward: 'Yes, always'
+    };
+
+    const noLabel = {
+      wrong:   "No, I'd have caught it",
+      ignore:  "No, I'd have caught it",
+      check:   'Honestly, maybe not',
+      forward: 'Honestly, maybe not'
+    };
+
+    const el = document.getElementById('reflection-context');
+    if (userChoice && labels[userChoice]) {
+      el.innerHTML = `<span>Your choice:</span> <span class="choice-label">${labels[userChoice]}</span>`;
+    }
+
+    const q = document.querySelector('#screen-6 .reflection-quote');
+    if (q) q.textContent = questions[userChoice] || questions.wrong;
+
+    const btns = document.querySelectorAll('#screen-6 .yn-buttons .btn');
+    if (btns[0]) btns[0].textContent = yesLabel[userChoice] || yesLabel.wrong;
+    if (btns[1]) btns[1].textContent = noLabel[userChoice] || noLabel.wrong;
+  }
+
+  // ─── Choice handler ───
+  function choose(choice) {
+    userChoice = choice;
+
+    const outcomes = {
+      wrong: {
+        icon: '🔓',
+        tag: '<span class="tag tag-red">Account Compromised</span>',
+        title: 'You clicked the link.',
+        body: `<p>The page looked exactly like a Microsoft login screen. You typed in your credentials and hit "Sign in."</p>
+               <p class="mt-2">Nothing happened. The page just reloaded. You assumed it was a glitch and headed to your standup.</p>
+               <p class="mt-2">You had just handed your work account to a criminal.</p>`,
+        next: 5,
+        nextLabel: 'See what happened next →',
+        cardClass: 'outcome-wrong'
+      },
+      ignore: {
+        icon: '⚠️',
+        tag: '<span class="tag tag-amber">Risk Not Resolved</span>',
+        title: 'You moved on. The email stayed in your inbox.',
+        body: `<p>Sometimes ignoring suspicious emails is fine. But this one isn't going away — and if it reached your inbox, it may have reached others too.</p>
+               <p class="mt-2">An unreported phishing email is a live threat. The attacker doesn't give up. They try again — or they move on to a colleague who's less careful.</p>
+               <p class="mt-2">Ignoring it isn't neutral. It leaves the door ajar.</p>`,
+        next: 6,
+        nextLabel: 'Continue →',
+        cardClass: 'outcome-ignore'
+      },
+      check: {
+        icon: '🔍',
+        tag: '<span class="tag tag-green">Phishing Identified</span>',
+        title: 'You stopped and looked closer.',
+        body: `<p>The sender address read <strong>security@micros0ft-accounts.com</strong>. Not microsoft. Micros<strong>0</strong>ft — with a zero.</p>
+               <p class="mt-2">You hovered over the "Verify Account" button. The URL pointed to <em>account-verify-ms.ru</em>. Nothing to do with Microsoft.</p>
+               <p class="mt-2">That 5-second check just protected your account, your colleagues, and potentially your company.</p>`,
+        next: 6,
+        nextLabel: 'Continue →',
+        cardClass: 'outcome-check'
+      },
+      forward: {
+        icon: '🛡️',
+        tag: '<span class="tag tag-green">Threat Stopped</span>',
+        title: 'You forwarded it to IT.',
+        body: `<p>IT confirmed it within 20 minutes: a credential harvesting campaign targeting your organisation. The phishing domain was blocked within the hour.</p>
+               <p class="mt-2">Six colleagues received the same email. Because you flagged it first, none of them clicked.</p>
+               <p class="mt-2">One email. One action. Threat neutralised.</p>`,
+        next: 6,
+        nextLabel: 'Continue →',
+        cardClass: 'outcome-forward'
+      }
+    };
+
+    const o = outcomes[choice];
+
+    // Build outcome card content
+    document.getElementById('outcome-card').innerHTML = `
+      <div class="${o.cardClass}">
+        <span class="outcome-icon">${o.icon}</span>
+        ${o.tag}
+        <h2 class="outcome-title">${o.title}</h2>
+        ${o.body}
+        <div class="mt-3">
+          <button class="btn btn-primary" onclick="goTo(${o.next})">${o.nextLabel}</button>
+        </div>
+      </div>
+    `;
+
+    // Slight delay for tension on wrong answer
+    const delay = choice === 'wrong' ? 600 : 0;
+    setTimeout(() => goTo(4), delay);
+  }
+
+  // ─── Reflection handler ───
+  function reflect(answer) {
+    const responseEl = document.getElementById('reflection-response');
+    const continueEl = document.getElementById('reflection-continue');
+
+    const wrong = userChoice === 'wrong';
+    const caught = userChoice === 'check' || userChoice === 'forward';
+
+    const responses = {
+      yes: {
+        text: wrong
+          ? `<p><strong>You already did — and recognising that matters.</strong></p>
+             <p class="mt-1">The email was engineered for exactly the moment you were in: behind, distracted, and facing a threat with a ticking clock. That's not carelessness. That's the attack working as designed.</p>`
+          : caught
+          ? `<p><strong>Good honest answer.</strong></p>
+             <p class="mt-1">The busiest moments are exactly when attackers strike. Keeping that discipline under pressure isn't automatic — it's a skill. This course will help you make it one.</p>`
+          : `<p><strong>You caught it this time — but you're still asking the right question.</strong></p>
+             <p class="mt-1">These attacks are built for the moments when you're not ready. The pressure, the urgency, the familiar branding — it's all deliberate. Staying sharp is a skill, not a setting.</p>`
+      },
+      no: {
+        text: wrong
+          ? `<p><strong>You clicked it — but that instinct to reflect is exactly right.</strong></p>
+             <p class="mt-1">91% of breaches start with a phishing email. The people who fall for them aren't careless — they're busy, and the emails are convincing. This course will show you what to look for even when you're under pressure.</p>`
+          : caught
+          ? `<p><strong>That consistency is your best defence.</strong></p>
+             <p class="mt-1">Over 30% of people click simulated phishing emails — including people in IT. The fact that you'd hold the line even when rushed is exactly the mindset this course is built to reinforce.</p>`
+          : `<p><strong>Good instinct. You spotted the signs.</strong></p>
+             <p class="mt-1">Over 30% of people click — including security professionals. The goal of this course isn't to make you feel safe. It's to make sure that instinct holds up when the pressure is real.</p>`
+      }
+    };
+
+    document.querySelector('#screen-6 .reflection-quote').classList.add('hidden');
+    document.querySelector('#screen-6 .yn-buttons').classList.add('hidden');
+
+    responseEl.innerHTML = responses[answer].text;
+    responseEl.classList.remove('hidden');
+    continueEl.classList.remove('hidden');
+  }
+
+  // ─── Completion signal ───
+  // Screen 7 is the final screen. When the learner reaches it, post a message
+  // to the parent LMS if needed:
+  // window.parent.postMessage({ type: 'EXPERIENCE_COMPLETE', choice: userChoice }, '*');
+</script>
+</body>
+</html>
