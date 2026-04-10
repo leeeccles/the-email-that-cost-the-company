@@ -48,10 +48,10 @@
       background: var(--grey-50);
     }
 
-    /* ─── Stage: fixed 800×600 canvas, scaled to fit ─── */
+    /* ─── Stage: fixed 960×560 canvas, scaled to fit ─── */
     #stage {
-      width: 800px;
-      height: 600px;
+      width: 960px;
+      height: 560px;
       position: relative;
       transform-origin: center center;
       flex-shrink: 0;
@@ -880,7 +880,7 @@
   // ─── Stage scaling ───
   function scaleStage() {
     const s = document.getElementById('stage');
-    const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
+    const scale = Math.min(window.innerWidth / 960, window.innerHeight / 560);
     s.style.transform = `scale(${scale})`;
   }
   window.addEventListener('resize', scaleStage);
