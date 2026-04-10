@@ -42,22 +42,33 @@
       position: fixed;
       inset: 0;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      padding: clamp(0.6rem, 2vw, 1.25rem);
+      justify-content: center;
       overflow: hidden;
+      background: var(--grey-50);
+    }
+
+    /* ─── Stage: fixed 800×600 canvas, scaled to fit ─── */
+    #stage {
+      width: 800px;
+      height: 600px;
+      position: relative;
+      transform-origin: center center;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: var(--grey-50);
     }
 
     /* ─── Screen transitions ─── */
     .screen {
       display: none;
-      width: 100%;
-      max-width: 680px;
-      flex: 1;
-      min-height: 0;
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      padding: 1.25rem;
       animation: fadeIn 0.35s ease forwards;
     }
-    .screen.active { display: flex; flex-direction: column; }
+    .screen.active { display: flex; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -67,8 +78,8 @@
     /* ─── Card ─── */
     .card {
       background: #fff;
-      border-radius: clamp(10px, 2vw, 16px);
-      padding: clamp(1rem, 4vw, 2rem) clamp(0.9rem, 3.5vw, 1.75rem);
+      border-radius: 14px;
+      padding: 1.75rem 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
       width: 100%;
       flex: 1;
@@ -78,34 +89,34 @@
 
     /* ─── Typography ─── */
     .eyebrow {
-      font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+      font-size: 0.7rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--grey-400);
-      margin-bottom: clamp(0.4rem, 1.5vh, 0.75rem);
+      margin-bottom: 0.6rem;
     }
     h1 {
-      font-size: clamp(1.25rem, 4.5vw, 2.25rem);
+      font-size: 2rem;
       font-weight: 800;
       line-height: 1.2;
       color: var(--grey-900);
-      margin-bottom: clamp(0.6rem, 2vh, 1rem);
+      margin-bottom: 0.75rem;
     }
     h2 {
-      font-size: clamp(1.05rem, 3.5vw, 1.6rem);
+      font-size: 1.4rem;
       font-weight: 700;
       line-height: 1.3;
       color: var(--grey-900);
-      margin-bottom: clamp(0.4rem, 1.5vh, 0.75rem);
+      margin-bottom: 0.6rem;
     }
     p {
-      font-size: clamp(0.82rem, 2vw, 0.975rem);
+      font-size: 0.925rem;
       line-height: 1.6;
       color: var(--grey-600);
     }
-    .spacer { margin-bottom: clamp(0.75rem, 2.5vh, 1.25rem); }
-    .spacer-sm { margin-bottom: clamp(0.5rem, 1.5vh, 0.75rem); }
+    .spacer { margin-bottom: 1rem; }
+    .spacer-sm { margin-bottom: 0.6rem; }
 
     /* ─── Buttons ─── */
     .btn {
@@ -114,13 +125,13 @@
       justify-content: center;
       gap: 0.5rem;
       font-family: inherit;
-      font-size: clamp(0.82rem, 2.2vw, 0.95rem);
+      font-size: 0.9rem;
       font-weight: 600;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      padding: clamp(0.6rem, 2vh, 0.85rem) clamp(1rem, 3vw, 1.75rem);
-      min-height: clamp(42px, 6vh, 52px);
+      padding: 0.75rem 1.5rem;
+      min-height: 46px;
       transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
       text-align: center;
       line-height: 1.3;
@@ -141,8 +152,8 @@
       text-align: left;
       justify-content: flex-start;
       border: 2px solid transparent;
-      padding: clamp(0.65rem, 1.8vh, 1rem) clamp(0.85rem, 2.5vw, 1.25rem);
-      font-size: clamp(0.82rem, 2vw, 0.95rem);
+      padding: 0.7rem 1rem;
+      font-size: 0.875rem;
     }
     .btn-choice:hover {
       background: #EFF6FF;
@@ -163,36 +174,36 @@
     }
     .btn-outline:hover { background: var(--grey-100); }
 
-    .choices { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.5vh, 0.75rem); margin-top: clamp(0.75rem, 2vh, 1.5rem); }
+    .choices { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
 
     /* ─── Screen 1: Hook ─── */
     #screen-1 .timestamp {
-      font-size: clamp(1.75rem, 7vw, 3.5rem);
+      font-size: 3rem;
       font-weight: 800;
       color: var(--grey-900);
       line-height: 1;
       margin-bottom: 0.2rem;
     }
     #screen-1 .day {
-      font-size: clamp(0.8rem, 2vw, 1rem);
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--grey-400);
-      margin-bottom: clamp(1rem, 3vh, 1.75rem);
+      margin-bottom: 1.25rem;
     }
     #screen-1 .notification-stack {
       background: var(--grey-100);
       border-radius: 10px;
-      padding: clamp(0.65rem, 2vw, 1rem);
-      margin-bottom: clamp(0.75rem, 2.5vh, 1.5rem);
+      padding: 0.85rem;
+      margin-bottom: 1rem;
       display: flex;
       flex-direction: column;
-      gap: clamp(0.3rem, 1vh, 0.5rem);
+      gap: 0.4rem;
     }
     .notif {
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      font-size: clamp(0.78rem, 1.8vw, 0.85rem);
+      font-size: 0.82rem;
     }
     .notif-dot {
       width: 8px;
@@ -381,14 +392,14 @@
       background: var(--red-light);
       border: 1px solid #FECACA;
       border-radius: 8px;
-      padding: clamp(0.5rem, 1.5vh, 0.75rem) clamp(0.75rem, 2vw, 1rem);
-      margin-bottom: clamp(0.9rem, 2.5vh, 1.5rem);
+      padding: 0.65rem 0.9rem;
+      margin-bottom: 1rem;
     }
     .pressure-icon { font-size: 1.1rem; }
-    .pressure-text { font-size: clamp(0.78rem, 1.8vw, 0.82rem); color: var(--red); font-weight: 600; line-height: 1.4; }
+    .pressure-text { font-size: 0.8rem; color: var(--red); font-weight: 600; line-height: 1.4; }
 
     /* ─── Screen 4: Consequence ─── */
-    .outcome-icon { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: clamp(0.5rem, 1.5vh, 1rem); display: block; }
+    .outcome-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
     .outcome-title { margin-bottom: 0.5rem; }
 
     .outcome-wrong .card { border-top: 4px solid var(--red); }
@@ -414,38 +425,38 @@
     .stat-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: clamp(0.5rem, 1.5vw, 1rem);
-      margin: clamp(0.75rem, 2.5vh, 1.25rem) 0;
+      gap: 0.6rem;
+      margin: 0.75rem 0;
     }
     .stat-card {
       background: var(--red-light);
       border: 1px solid #FECACA;
       border-radius: 10px;
-      padding: clamp(0.6rem, 2vw, 1rem);
+      padding: 0.65rem 0.75rem;
       text-align: center;
     }
     .stat-number {
-      font-size: clamp(1.2rem, 4vw, 2rem);
+      font-size: 1.5rem;
       font-weight: 800;
       color: var(--red);
       line-height: 1;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
     }
-    .stat-label { font-size: clamp(0.68rem, 1.5vw, 0.75rem); color: var(--grey-600); font-weight: 500; line-height: 1.3; }
+    .stat-label { font-size: 0.7rem; color: var(--grey-600); font-weight: 500; line-height: 1.3; }
 
     .timeline {
       border-left: 2px solid var(--grey-200);
-      padding-left: 1.25rem;
-      margin: clamp(0.75rem, 2.5vh, 1.25rem) 0;
+      padding-left: 1.1rem;
+      margin: 0.75rem 0;
       display: flex;
       flex-direction: column;
-      gap: clamp(0.5rem, 1.5vh, 0.85rem);
+      gap: 0.55rem;
     }
     .timeline-item { position: relative; }
     .timeline-item::before {
       content: '';
       position: absolute;
-      left: -1.45rem;
+      left: -1.3rem;
       top: 5px;
       width: 10px;
       height: 10px;
@@ -454,8 +465,8 @@
       border: 2px solid white;
       box-shadow: 0 0 0 2px var(--red);
     }
-    .timeline-time { font-size: clamp(0.68rem, 1.5vw, 0.72rem); font-weight: 700; color: var(--red); margin-bottom: 0.15rem; }
-    .timeline-desc { font-size: clamp(0.78rem, 1.8vw, 0.82rem); color: var(--grey-700, #374151); line-height: 1.5; }
+    .timeline-time { font-size: 0.68rem; font-weight: 700; color: var(--red); margin-bottom: 0.1rem; }
+    .timeline-desc { font-size: 0.78rem; color: var(--grey-700, #374151); line-height: 1.45; }
 
     /* ─── Screen 6: Reflection ─── */
     .reflection-context {
@@ -477,11 +488,11 @@
     }
 
     .reflection-quote {
-      font-size: clamp(1rem, 3vw, 1.4rem);
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--grey-900);
       line-height: 1.4;
-      margin-bottom: clamp(0.75rem, 2vh, 1.25rem);
+      margin-bottom: 1rem;
     }
     .reflection-sub { font-size: 0.875rem; color: var(--grey-400); margin-bottom: 1.75rem; }
     .yn-buttons { display: flex; gap: 0.75rem; }
@@ -499,8 +510,8 @@
       background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
       border: 1px solid #BFDBFE;
       border-radius: 12px;
-      padding: clamp(0.85rem, 2.5vw, 1.25rem);
-      margin: clamp(0.75rem, 2.5vh, 1.25rem) 0;
+      padding: 1rem;
+      margin: 0.9rem 0;
     }
     .course-preview-label {
       font-size: 0.72rem;
@@ -515,7 +526,7 @@
       display: flex;
       align-items: flex-start;
       gap: 0.6rem;
-      font-size: clamp(0.78rem, 1.8vw, 0.875rem);
+      font-size: 0.85rem;
       color: var(--grey-700, #374151);
     }
     .course-list li::before {
@@ -532,7 +543,8 @@
       display: flex;
       justify-content: center;
       gap: 6px;
-      margin-top: clamp(0.6rem, 2vh, 1.5rem);
+      margin-top: 0.75rem;
+      flex-shrink: 0;
     }
     .dot {
       width: 6px;
@@ -571,19 +583,7 @@
     }
     #fs-btn:hover { background: #fff; color: var(--grey-900); }
 
-    /* ─── Structural breakpoints (layout only — sizing handled by clamp above) ─── */
-
-    /* Short viewports: anchor content to top so it scrolls naturally */
-    @media (max-height: 560px) {
-      #app { align-items: flex-start; }
-    }
-
-    /* Narrow screens: stack yn-buttons, collapse stat grid, hide email sidebar */
-    @media (max-width: 440px) {
-      .yn-buttons { flex-direction: column; }
-      .stat-grid { grid-template-columns: 1fr; }
-      .email-sidebar { display: none; }
-    }
+    /* No breakpoints needed — stage transform handles all screen sizes */
   </style>
 </head>
 <body>
@@ -600,6 +600,7 @@
 </button>
 
 <div id="app">
+<div id="stage">
 
   <!-- ════════════════════════════════════
        SCREEN 1 — HOOK
@@ -872,9 +873,19 @@
     </div>
   </section>
 
-</div>
+</div><!-- /#stage -->
+</div><!-- /#app -->
 
 <script>
+  // ─── Stage scaling ───
+  function scaleStage() {
+    const s = document.getElementById('stage');
+    const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
+    s.style.transform = `scale(${scale})`;
+  }
+  window.addEventListener('resize', scaleStage);
+  scaleStage();
+
   // ─── State ───
   let userChoice = null;
 
